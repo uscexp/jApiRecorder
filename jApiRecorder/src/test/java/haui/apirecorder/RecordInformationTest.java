@@ -29,6 +29,23 @@ public class RecordInformationTest {
         Assert.assertEquals("test", result);
     }
 
+    @Test
+    public void testGetReturnValueId() throws Exception {
+        Object[] args = { "a", "b" };
+        int[] argIdx4Pk = {};
+        RecordInformation recordInformation = new RecordInformation("test", args, argIdx4Pk);
+
+        recordInformation.setReturnValue("test");
+        
+        long result = recordInformation.getReturnValueId();
+       
+        long current = 0;
+        for (int i = 0; i < args.length; i++) {
+            current += args[i].hashCode();
+        }
+        Assert.assertEquals(current, result);
+    }
+
     @Test(expected = IllegalArgumentException.class)
     public void testParameterValidationMethod() {
         Object[] args = { "a", "b" };
@@ -54,20 +71,6 @@ public class RecordInformationTest {
     public void testParameterValidationArgs3() {
         Object[] args = { "a" };
         int[] argIdx4Pk = { 0, 0 };
-        new RecordInformation("test", args, argIdx4Pk);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testParameterValidationArgIdx4Pk() {
-        Object[] args = { "a", "b" };
-        int[] argIdx4Pk = null;
-        new RecordInformation("test", args, argIdx4Pk);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testParameterValidationArgIdx4Pk2() {
-        Object[] args = { "a", "b" };
-        int[] argIdx4Pk = {};
         new RecordInformation("test", args, argIdx4Pk);
     }
 
