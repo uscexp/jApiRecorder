@@ -25,10 +25,10 @@ public class RecordPlaybackManager extends Enhancer implements MethodInterceptor
 
     private static Logger logger = Logger.getLogger(RecordPlaybackManager.class.getSimpleName());
 
-    private RecordPlaybackMode recordPlaybackMode;
-    private ContentTypeStrategy contentTypeStrategy;
-    private ReadWriteStrategy readWriteStrategy;
-    private RecordPlaybackConfiguration recordPlaybackConfiguration;
+    private final RecordPlaybackMode recordPlaybackMode;
+    private final ContentTypeStrategy contentTypeStrategy;
+    private final ReadWriteStrategy readWriteStrategy;
+    private final RecordPlaybackConfiguration recordPlaybackConfiguration;
 
     public static Object newInstance(Class<? extends Object> classToProxy, RecordPlaybackMode recordPlaybackMode,
             ContentTypeStrategy contentTypeStrategy, ReadWriteStrategy readWriteStrategy,
