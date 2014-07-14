@@ -1,9 +1,7 @@
 /*
- * (C) 2014 haui
+ * Copyright (C) 2014 by haui - all rights reserved
  */
-package haui.apirecorder.readwritestrategy;
-
-import haui.apirecorder.exception.ReadWriteStrategyException;
+package com.github.uscexp.apirecorder.readwritestrategy;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -11,6 +9,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+
+import com.github.uscexp.apirecorder.exception.ReadWriteStrategyException;
 
 /**
  * @author haui

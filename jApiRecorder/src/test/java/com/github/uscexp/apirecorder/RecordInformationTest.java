@@ -1,8 +1,17 @@
-package haui.apirecorder;
+/*
+ * Copyright (C) 2014 by haui - all rights reserved
+ */
+package com.github.uscexp.apirecorder;
 
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.github.uscexp.apirecorder.RecordInformation;
+
+/**
+ * @author haui
+ *
+ */
 public class RecordInformationTest {
 
     @Test

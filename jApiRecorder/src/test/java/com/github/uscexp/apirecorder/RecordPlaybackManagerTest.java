@@ -1,15 +1,22 @@
-package haui.apirecorder;
-
-import haui.apirecorder.contenttypestrategy.ContentTypeStrategy;
-import haui.apirecorder.contenttypestrategy.XStreamContentTypeStrategy;
-import haui.apirecorder.readwritestrategy.H2ReadWriteStrategy;
-import haui.apirecorder.readwritestrategy.ReadWriteStrategy;
+/*
+ * Copyright (C) 2014 by haui - all rights reserved
+ */
+package com.github.uscexp.apirecorder;
 
 import java.util.Date;
 
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.github.uscexp.apirecorder.contenttypestrategy.ContentTypeStrategy;
+import com.github.uscexp.apirecorder.contenttypestrategy.XStreamContentTypeStrategy;
+import com.github.uscexp.apirecorder.readwritestrategy.H2ReadWriteStrategy;
+import com.github.uscexp.apirecorder.readwritestrategy.ReadWriteStrategy;
+
+/**
+ * @author haui
+ *
+ */
 public class RecordPlaybackManagerTest {
 
     @Test

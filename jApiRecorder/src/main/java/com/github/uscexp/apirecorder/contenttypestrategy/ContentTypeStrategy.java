@@ -1,9 +1,9 @@
 /*
- * (C) 2014 haui
+ * Copyright (C) 2014 by haui - all rights reserved
  */
-package haui.apirecorder.contenttypestrategy;
+package com.github.uscexp.apirecorder.contenttypestrategy;
 
-import haui.apirecorder.exception.ContentTypeStrategyException;
+import com.github.uscexp.apirecorder.exception.ContentTypeStrategyException;
 
 /**
  * @author haui

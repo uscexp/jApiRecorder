@@ -2,12 +2,42 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>haui</groupId>
+	<groupId>com.github.uscexp</groupId>
 	<artifactId>jApiRecorder</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>jApiRecorder</name>
+	<description>A dynamic proxy to record and playback method calls e.g. for testing porposes.</description>
+	<url>https://github.com/uscexp/jApiRecorder</url>
+
+	<issueManagement>
+		<url>https://github.com/uscexp/jApiRecorder/issues</url>
+		<system>GitHub Issues</system>
+	</issueManagement>
+
+	<licenses>
+		<license>
+			<name>GNU Lesser General Public License (LGPL)</name>
+			<url>https://www.gnu.org/licenses/lgpl-3.0.txt</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+
+	<scm>
+		<url>https://github.com/uscexp/jApiRecorder</url>
+		<connection>scm:git:git://github.com/uscexp/jApiRecorder.git</connection>
+		<developerConnection>scm:git:git@github.com/uscexp/jApiRecorder.git</developerConnection>
+	</scm>
+
+	<developers>
+		<developer>
+			<email>hauitoo@googlemail.com</email>
+			<name>haui</name>
+			<url>https://github.com/uscexp</url>
+			<id>haui</id>
+		</developer>
+	</developers>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -40,6 +70,33 @@
 						<include>**/*Tests.java</include>
 					</includes>
 				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>attach-sources</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<configuration>
+					<show>public</show>
+				</configuration>
+				<executions>
+					<execution>
+						<id>attach-javadocs</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>

@@ -1,18 +1,19 @@
 /*
- * (C) 2014 haui
+ * Copyright (C) 2014 by haui - all rights reserved
  */
-package haui.apirecorder;
-
-import haui.apirecorder.attributereplacement.ReplacementConfiguration;
+package com.github.uscexp.apirecorder;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.github.uscexp.apirecorder.attributereplacement.ReplacementConfiguration;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 
 /**
+ * The configuration of the identification of the recorded objects and the attribute replacment.
+ * 
  * @author haui
  *
  */

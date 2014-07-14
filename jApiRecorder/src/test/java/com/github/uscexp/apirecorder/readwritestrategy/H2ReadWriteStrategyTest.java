@@ -1,9 +1,16 @@
-package haui.apirecorder.readwritestrategy;
+/*
+ * Copyright (C) 2014 by haui - all rights reserved
+ */
+package com.github.uscexp.apirecorder.readwritestrategy;
 
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+/**
+ * @author haui
+ *
+ */
 public class H2ReadWriteStrategyTest {
 
     private H2ReadWriteStrategy h2ReadWriteStrategySUT;

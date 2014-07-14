@@ -1,7 +1,14 @@
-package haui.apirecorder;
+/*
+ * Copyright (C) 2014 by haui - all rights reserved
+ */
+package com.github.uscexp.apirecorder;
 
 import java.util.Date;
 
+/**
+ * @author haui
+ *
+ */
 public class TestClass {
     
     private String text = "intern";

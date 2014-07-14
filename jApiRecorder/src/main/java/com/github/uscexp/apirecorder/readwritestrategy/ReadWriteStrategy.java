@@ -1,9 +1,9 @@
 /*
- * (C) 2014 haui
+ * Copyright (C) 2014 by haui - all rights reserved
  */
-package haui.apirecorder.readwritestrategy;
+package com.github.uscexp.apirecorder.readwritestrategy;
 
-import haui.apirecorder.exception.ReadWriteStrategyException;
+import com.github.uscexp.apirecorder.exception.ReadWriteStrategyException;
 
 /**
  * @author haui

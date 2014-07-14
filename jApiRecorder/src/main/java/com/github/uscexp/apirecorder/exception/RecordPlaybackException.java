@@ -1,7 +1,7 @@
 /*
- * (C) 2014 haui
+ * Copyright (C) 2014 by haui - all rights reserved
  */
-package haui.apirecorder.exception;
+package com.github.uscexp.apirecorder.exception;
 
 /**
  * @author haui
