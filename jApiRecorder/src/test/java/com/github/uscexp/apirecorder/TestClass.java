@@ -12,6 +12,7 @@ import java.util.Date;
 public class TestClass {
     
     private String text = "intern";
+    private TestClass testClass;
     
     public TestClass() {
         
@@ -23,5 +24,14 @@ public class TestClass {
 
     public String simpleMethod(int i, String text, Date date) {
         return "" + i + text + date.toString() + this.text;
+    }
+    
+    public TestClass simpleLevel2Method(int i, String text, Date date) {
+        this.testClass = new TestClass(text);
+        return testClass;
+    }
+
+    public String getText() {
+        return text;
     }
 }

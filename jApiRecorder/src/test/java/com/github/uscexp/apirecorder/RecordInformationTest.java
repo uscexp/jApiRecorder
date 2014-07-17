@@ -6,13 +6,11 @@ package com.github.uscexp.apirecorder;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.github.uscexp.apirecorder.RecordInformation;
-
 /**
  * @author haui
  *
  */
-public class RecordInformationTest {
+public class RecordInformationTest extends JUnitBase {
 
     @Test
     public void testRecordInformation() throws Exception {

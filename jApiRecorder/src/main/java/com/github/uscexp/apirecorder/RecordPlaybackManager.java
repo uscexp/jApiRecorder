@@ -4,6 +4,7 @@
 package com.github.uscexp.apirecorder;
 
 import java.lang.reflect.Method;
+import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -11,6 +12,8 @@ import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
 
+import com.github.uscexp.apirecorder.attributereplacement.AttributeValueReplacer;
+import com.github.uscexp.apirecorder.attributereplacement.ReplacementConfiguration;
 import com.github.uscexp.apirecorder.contenttypestrategy.ContentTypeStrategy;
 import com.github.uscexp.apirecorder.contenttypestrategy.XStreamContentTypeStrategy;
 import com.github.uscexp.apirecorder.exception.ContentTypeStrategyException;
@@ -18,6 +21,7 @@ import com.github.uscexp.apirecorder.exception.ReadWriteStrategyException;
 import com.github.uscexp.apirecorder.exception.RecordPlaybackException;
 import com.github.uscexp.apirecorder.readwritestrategy.H2ReadWriteStrategy;
 import com.github.uscexp.apirecorder.readwritestrategy.ReadWriteStrategy;
+import com.github.uscexp.dotnotation.exception.AttributeAccessExeption;
 
 /**
  * This class creates a dynamic proxy of a class to record/playback.
@@ -49,7 +53,10 @@ import com.github.uscexp.apirecorder.readwritestrategy.ReadWriteStrategy;
  */
 public class RecordPlaybackManager extends Enhancer implements MethodInterceptor {
 
-	private static Logger logger = Logger.getLogger(RecordPlaybackManager.class.getSimpleName());
+	private static final Level LOG_LEVEL = Level.FINEST;
+    private static final Level ERROR_LOG_LEVEL = Level.INFO;
+
+    private static Logger logger = Logger.getLogger(RecordPlaybackManager.class.getName());
 
 	private final RecordPlaybackMode recordPlaybackMode;
 	private final ContentTypeStrategy contentTypeStrategy;
@@ -74,16 +81,16 @@ public class RecordPlaybackManager extends Enhancer implements MethodInterceptor
 	}
 
 	/**
-     * Creates a dynamic proxy of the given class using a constructor with parameters.
-	 * 
-     * @param classToProxy class to create a dynamic proxy from it.
+	* Creates a dynamic proxy of the given class using a constructor with parameters.
+	 *
+	* @param classToProxy class to create a dynamic proxy from it.
 	 * @param parameterTypes parameter types for the constructor call.
 	 * @param args parameter args for the constructor call.
-     * @param recordPlaybackMode the behavior of the proxy.
-     * @param contentTypeStrategy the strategy for serialzation/deserialization.
-     * @param readWriteStrategy the strategy for reading/writing the data.
-     * @param recordPlaybackConfiguration the configuration of the identification of the recorded objects and the attribute replacment.
-     * @return the dynamic proxy object.
+	* @param recordPlaybackMode the behavior of the proxy.
+	* @param contentTypeStrategy the strategy for serialzation/deserialization.
+	* @param readWriteStrategy the strategy for reading/writing the data.
+	* @param recordPlaybackConfiguration the configuration of the identification of the recorded objects and the attribute replacment.
+	* @return the dynamic proxy object.
 	 */
 	public static Object newInstance(Class<? extends Object> classToProxy, Class<? extends Object>[] parameterTypes, Object[] args,
 			RecordPlaybackMode recordPlaybackMode, ContentTypeStrategy contentTypeStrategy, ReadWriteStrategy readWriteStrategy,
@@ -140,20 +147,27 @@ public class RecordPlaybackManager extends Enhancer implements MethodInterceptor
 					recordInformation = playback(obj, method, args, proxy);
 					break;
 			}
-		} catch (ContentTypeStrategyException | ReadWriteStrategyException e) {
+		} catch (ContentTypeStrategyException | ReadWriteStrategyException | AttributeAccessExeption e) {
 			throw new RecordPlaybackException("Unexpected exception in RecordPlaybackManager", e);
 		}
 		return recordInformation.getReturnValue();
 	}
 
 	private RecordInformation playback(Object obj, Method method, Object[] args, MethodProxy proxy)
-		throws ReadWriteStrategyException, ContentTypeStrategyException {
+		throws ReadWriteStrategyException, ContentTypeStrategyException, AttributeAccessExeption {
 		RecordInformation result = new RecordInformation(method.getName(), args,
 				recordPlaybackConfiguration.getArgumentIndices4PrimaryKey(method.getName()));
 		logStep(method, args, "playback...");
 		String serializedObject = readWriteStrategy.read(result.getReturnValueId());
 		if (serializedObject != null) {
 			Object object = contentTypeStrategy.deserialize(serializedObject);
+			if (object != null) {
+				Collection<ReplacementConfiguration> replacementConfigurations = recordPlaybackConfiguration.getReplacementConfigurations(
+						method.getName());
+				if ((replacementConfigurations != null) && !replacementConfigurations.isEmpty()) {
+					object = AttributeValueReplacer.replace(object, replacementConfigurations);
+				}
+			}
 			result.setReturnValue(object);
 		}
 		return result;
@@ -162,10 +176,12 @@ public class RecordPlaybackManager extends Enhancer implements MethodInterceptor
 	private void record(RecordInformation recordInformation)
 		throws ContentTypeStrategyException, ReadWriteStrategyException {
 
-		logger.finest("recording...");
-		logger.finest(String.format("ReturnValueId: %s", recordInformation.getReturnValueId()));
-		if (recordInformation.getReturnValue() != null)
-			logger.finest(String.format("ReturnValue type: %s", recordInformation.getReturnValue().getClass()));
+	    String type = "?";
+        if (recordInformation.getReturnValue() != null) {
+            type = recordInformation.getReturnValue().getClass().getSimpleName();
+        }
+        String message = String.format("recording... ReturnValueId: %s; ReturnValue type: %s", recordInformation.getReturnValueId(), type);
+		logger.log(LOG_LEVEL, message);
 		String serializedObject = contentTypeStrategy.serialize(recordInformation.getReturnValue());
 		readWriteStrategy.write(recordInformation.getReturnValueId(), serializedObject);
 	}
@@ -179,18 +195,17 @@ public class RecordPlaybackManager extends Enhancer implements MethodInterceptor
 					recordPlaybackConfiguration.getArgumentIndices4PrimaryKey(method.getName()));
 			result.setReturnValue(methodResult);
 		} catch (Throwable e) {
-			logger.log(Level.FINEST, e.getMessage(), e);
+			logger.log(ERROR_LOG_LEVEL, e.getMessage(), e);
 		}
 		return result;
 	}
 
 	private void logStep(Method method, Object[] args, String step) {
-		logger.finest(step);
-		logger.finest("method name: " + method.getName());
-		logger.finest("method arguments:");
-		for (Object arg : args) {
-			logger.finest(" " + arg);
-		}
-		logger.finest("\n");
+	    String arguments = "";
+        for (Object arg : args) {
+            arguments += " '" + arg + "'";
+        }
+	    String message = String.format("%s method name: %s; method arguments:%s", step, method.getName(), arguments);
+		logger.log(LOG_LEVEL, message);
 	}
 }

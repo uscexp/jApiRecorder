@@ -9,20 +9,20 @@ package com.github.uscexp.apirecorder.attributereplacement;
  */
 public class ReplacementConfiguration {
 
-    private final String methodName;
+//    private final String methodName;
     private final String replacementPath;
     private final Object value;
     
-    public ReplacementConfiguration(String methodName, String replacementPath, Object value) {
+    public ReplacementConfiguration(String replacementPath, Object value) {
         super();
-        this.methodName = methodName;
+//        this.methodName = methodName;
         this.replacementPath = replacementPath;
         this.value = value;
     }
 
-    public String getMethodName() {
-        return methodName;
-    }
+//    public String getMethodName() {
+//        return methodName;
+//    }
 
     public String getReplacementPath() {
         return replacementPath;
