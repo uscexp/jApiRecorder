@@ -3,12 +3,18 @@
  */
 package com.github.uscexp.apirecorder.attributereplacement.replacementvalues;
 
+import com.github.uscexp.apirecorder.RecordInformation;
+import com.github.uscexp.apirecorder.exception.ReplacementValueException;
+
 /**
  * @author haui
  *
  */
-public abstract class ReplacementValue {
+public interface ReplacementValue {
 
-    private ReplacementValueType replacementValueType;
-    
+	void setValue(Object value);
+
+	Object getValue();
+
+	Object getReplacementValue(RecordInformation recordInformation) throws ReplacementValueException;
 }

@@ -10,18 +10,22 @@ import com.github.uscexp.apirecorder.exception.ReplacementValueException;
  * @author haui
  *
  */
-public class ReplacementGivenValue extends AbstractReplacementValue {
-    
-    private Object givenValue;
-    
-    public ReplacementGivenValue(ReplacementValue replacementValue, Object givenValue) {
-        super(replacementValue);
-        this.givenValue = givenValue;
+public class ReplacementValueImpl implements ReplacementValue {
+
+    private Object value;
+
+    @Override
+    public void setValue(Object value) {
+        this.value = value;
+    }
+
+    @Override
+    public Object getValue() {
+        return value;
     }
 
     @Override
     public Object getReplacementValue(RecordInformation recordInformation) throws ReplacementValueException {
-        setValue(givenValue);
-        return replacementValue.getReplacementValue(recordInformation);
+        return value;
     }
 }
