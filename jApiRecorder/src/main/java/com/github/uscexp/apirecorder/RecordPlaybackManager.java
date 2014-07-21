@@ -19,12 +19,13 @@ import com.github.uscexp.apirecorder.contenttypestrategy.XStreamContentTypeStrat
 import com.github.uscexp.apirecorder.exception.ContentTypeStrategyException;
 import com.github.uscexp.apirecorder.exception.ReadWriteStrategyException;
 import com.github.uscexp.apirecorder.exception.RecordPlaybackException;
+import com.github.uscexp.apirecorder.exception.ReplacementValueException;
 import com.github.uscexp.apirecorder.readwritestrategy.H2ReadWriteStrategy;
 import com.github.uscexp.apirecorder.readwritestrategy.ReadWriteStrategy;
 import com.github.uscexp.dotnotation.exception.AttributeAccessExeption;
 
 /**
- * This class creates a dynamic proxy of a class to record/playback.
+ * This class creates a dynamic proxy of a class to record/playback method calls.
  * <p>
  * There are four modes to go:<br>
  * <dl>
@@ -36,7 +37,7 @@ import com.github.uscexp.dotnotation.exception.AttributeAccessExeption;
  * <dd>tries first to get a return value from the recorded data. if there is one it will be returned,
  * else it calls the original method, records the return value and returns it.</dd>
  * <dt>PB_OFFLINE</dt>
- * <dd>tries to get a return value from the recorded data. if there is none it will return a null.</dd>
+ * <dd>tries to get a return value from the recorded data. if there is none it will return null.</dd>
  * </p>
  * It is possible to implement your own {@link ReadWriteStrategy} and/or {@link ContentTypeStrategy}.
  * You only have to implement the given interfaces.
@@ -54,9 +55,9 @@ import com.github.uscexp.dotnotation.exception.AttributeAccessExeption;
 public class RecordPlaybackManager extends Enhancer implements MethodInterceptor {
 
 	private static final Level LOG_LEVEL = Level.FINEST;
-    private static final Level ERROR_LOG_LEVEL = Level.INFO;
+	private static final Level ERROR_LOG_LEVEL = Level.INFO;
 
-    private static Logger logger = Logger.getLogger(RecordPlaybackManager.class.getName());
+	private static Logger logger = Logger.getLogger(RecordPlaybackManager.class.getName());
 
 	private final RecordPlaybackMode recordPlaybackMode;
 	private final ContentTypeStrategy contentTypeStrategy;
@@ -147,14 +148,14 @@ public class RecordPlaybackManager extends Enhancer implements MethodInterceptor
 					recordInformation = playback(obj, method, args, proxy);
 					break;
 			}
-		} catch (ContentTypeStrategyException | ReadWriteStrategyException | AttributeAccessExeption e) {
+		} catch (ContentTypeStrategyException | ReadWriteStrategyException | AttributeAccessExeption | ReplacementValueException e) {
 			throw new RecordPlaybackException("Unexpected exception in RecordPlaybackManager", e);
 		}
 		return recordInformation.getReturnValue();
 	}
 
 	private RecordInformation playback(Object obj, Method method, Object[] args, MethodProxy proxy)
-		throws ReadWriteStrategyException, ContentTypeStrategyException, AttributeAccessExeption {
+		throws ReadWriteStrategyException, ContentTypeStrategyException, AttributeAccessExeption, ReplacementValueException {
 		RecordInformation result = new RecordInformation(method.getName(), args,
 				recordPlaybackConfiguration.getArgumentIndices4PrimaryKey(method.getName()));
 		logStep(method, args, "playback...");
@@ -165,7 +166,7 @@ public class RecordPlaybackManager extends Enhancer implements MethodInterceptor
 				Collection<ReplacementConfiguration> replacementConfigurations = recordPlaybackConfiguration.getReplacementConfigurations(
 						method.getName());
 				if ((replacementConfigurations != null) && !replacementConfigurations.isEmpty()) {
-					object = AttributeValueReplacer.replace(object, replacementConfigurations);
+					object = AttributeValueReplacer.replace(object, result, replacementConfigurations);
 				}
 			}
 			result.setReturnValue(object);
@@ -176,11 +177,11 @@ public class RecordPlaybackManager extends Enhancer implements MethodInterceptor
 	private void record(RecordInformation recordInformation)
 		throws ContentTypeStrategyException, ReadWriteStrategyException {
 
-	    String type = "?";
-        if (recordInformation.getReturnValue() != null) {
-            type = recordInformation.getReturnValue().getClass().getSimpleName();
-        }
-        String message = String.format("recording... ReturnValueId: %s; ReturnValue type: %s", recordInformation.getReturnValueId(), type);
+		String type = "?";
+		if (recordInformation.getReturnValue() != null) {
+			type = recordInformation.getReturnValue().getClass().getSimpleName();
+		}
+		String message = String.format("recording... ReturnValueId: %s; ReturnValue type: %s", recordInformation.getReturnValueId(), type);
 		logger.log(LOG_LEVEL, message);
 		String serializedObject = contentTypeStrategy.serialize(recordInformation.getReturnValue());
 		readWriteStrategy.write(recordInformation.getReturnValueId(), serializedObject);
@@ -201,11 +202,11 @@ public class RecordPlaybackManager extends Enhancer implements MethodInterceptor
 	}
 
 	private void logStep(Method method, Object[] args, String step) {
-	    String arguments = "";
-        for (Object arg : args) {
-            arguments += " '" + arg + "'";
-        }
-	    String message = String.format("%s method name: %s; method arguments:%s", step, method.getName(), arguments);
+		String arguments = "";
+		for (Object arg : args) {
+			arguments += " '" + arg + "'";
+		}
+		String message = String.format("%s method name: %s; method arguments:%s", step, method.getName(), arguments);
 		logger.log(LOG_LEVEL, message);
 	}
 }

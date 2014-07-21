@@ -6,6 +6,8 @@ package com.github.uscexp.apirecorder.attributereplacement.replacementvalues;
 import com.github.uscexp.apirecorder.attributereplacement.replacementtreatment.ReplacementValueTreatment;
 
 /**
+ * The {@link ReplacementValueFactory} constructes valid {@link ReplacementValue} combinations.
+ * 
  * @author haui
  *
  */

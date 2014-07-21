@@ -6,6 +6,8 @@ package com.github.uscexp.apirecorder.contenttypestrategy;
 import com.github.uscexp.apirecorder.exception.ContentTypeStrategyException;
 
 /**
+ * The {@link ContentTypeStrategy} provides the logic to serialize and deserialize the objects.
+ * 
  * @author haui
  *
  */

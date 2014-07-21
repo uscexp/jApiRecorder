@@ -6,6 +6,8 @@ package com.github.uscexp.apirecorder.readwritestrategy;
 import com.github.uscexp.apirecorder.exception.ReadWriteStrategyException;
 
 /**
+ * The {@link ReadWriteStrategy} provides the logic to store and retreive the data.
+ * 
  * @author haui
  *
  */

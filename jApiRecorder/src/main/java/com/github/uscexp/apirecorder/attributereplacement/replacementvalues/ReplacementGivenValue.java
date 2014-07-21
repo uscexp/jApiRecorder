@@ -7,6 +7,8 @@ import com.github.uscexp.apirecorder.RecordInformation;
 import com.github.uscexp.apirecorder.exception.ReplacementValueException;
 
 /**
+ * Specifies a fix value for later attribute replacement.
+ * 
  * @author haui
  *
  */

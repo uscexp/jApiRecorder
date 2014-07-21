@@ -7,6 +7,8 @@ import com.github.uscexp.apirecorder.RecordInformation;
 import com.github.uscexp.apirecorder.exception.ReplacementValueException;
 
 /**
+ * Specifies an index of a argument value of the method call for later attribute replacement.
+ * 
  * @author haui
  *
  */

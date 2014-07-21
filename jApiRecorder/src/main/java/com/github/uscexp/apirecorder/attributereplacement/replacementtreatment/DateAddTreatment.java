@@ -10,6 +10,11 @@ import com.github.uscexp.apirecorder.exception.ReplacementValueTreatmentExceptio
 import com.google.common.base.Preconditions;
 
 /**
+ * The {@link DateAddTreatment} can manipulate {@link Date} values
+ * (add a specific amount to a specified {@link Calendar} field).
+ * One can also specify if the start point of the manipulation should
+ * be today or leave the value as is.
+ * 
  * @author haui
  *
  */

@@ -9,6 +9,8 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import com.github.uscexp.apirecorder.attributereplacement.ReplacementConfiguration;
+import com.github.uscexp.apirecorder.attributereplacement.replacementvalues.ReplacementValue;
+import com.github.uscexp.apirecorder.attributereplacement.replacementvalues.ReplacementValueFactory;
 import com.github.uscexp.apirecorder.contenttypestrategy.ContentTypeStrategy;
 import com.github.uscexp.apirecorder.contenttypestrategy.XStreamContentTypeStrategy;
 import com.github.uscexp.apirecorder.readwritestrategy.H2ReadWriteStrategy;
@@ -112,7 +114,8 @@ public class RecordPlaybackManagerTest extends JUnitBase {
         Assert.assertEquals(text, result.getText());
 
         String value = "post_extern";
-        ReplacementConfiguration replacementConfiguration = new ReplacementConfiguration("text", value);
+        ReplacementValue replacementValue = ReplacementValueFactory.createReplacementGivenValue(value);
+        ReplacementConfiguration replacementConfiguration = new ReplacementConfiguration("text", replacementValue);
         recordPlaybackConfiguration.addReplacementConfiguration("simpleLevel2Method", replacementConfiguration );
         testClass = (TestClass) RecordPlaybackManager.newInstance(TestClass.class, RecordPlaybackMode.PB_OFFLINE, contentTypeStrategy,
                 readWriteStrategy, recordPlaybackConfiguration);

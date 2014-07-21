@@ -9,6 +9,9 @@ import com.github.uscexp.apirecorder.exception.ReplacementValueException;
 import com.github.uscexp.apirecorder.exception.ReplacementValueTreatmentException;
 
 /**
+ * The {@link ReplacementCommandTreatedValue} manipulates values from previous (parent) {@link ReplacementValue}
+ * objects with the given {@link ReplacementValueTreatment}.
+ * 
  * @author haui
  *
  */
