@@ -108,6 +108,8 @@ E.g. one want to change a <code>Date</code> attribute of the result and change i
 <p>I want to record/playback the method call <code>simpleLevel2Method</code> in <code>TestClass</code>.
 First I create a <code>ContentTypeStrategy</code> and a <code>ReadWriteStrategy</code> instance. Then I need a <code>RecordPlaybackConfiguration</code> where I define which method arguments indices (here 0 and 1) are used to create a primary key for the recorded value for later retrieval. I create a dynamic proxy instance of my <code>TestClass</code> in RECORD Mode. Then I call the method to record the result value.
 Afterwards I create a <code>ReplacementValue</code>, because I want to change the <code>text</code> attribute in my <code>TestClass</code> on playback. Then I create a <code>ReplacementConfiguration</code> with an attribute path to the <code>text</code> attribute and the replacement value and add it to the <code>RecordPlaybackConfiguration</code> for <code>simpleLevel2Method</code>. I create a dynamic proxy instance of my <code>TestClass</code> in PB_OFFLINE Mode. After calling the <code>simpleLevel2Method</code> I get the previous recorded value of the <code>TestClass</code> except the <code>text</code> attribute which returns the value I set with the <code>ReplacementConfiguration</code>.</p>
+
+<p>(C) 2014 by haui</p>
       </section>
       <footer>
         <p>This project is maintained by <a href="https://github.com/uscexp">uscexp</a></p>
