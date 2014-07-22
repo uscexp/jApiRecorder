@@ -9,7 +9,7 @@
 
 	<name>${project.groupId}:${project.artifactId}</name>
 	<description>A dynamic proxy to record and playback API method calls e.g. for testing porposes.</description>
-	<url>https://github.com/uscexp/jApiRecorder</url>
+	<url>http://uscexp.github.io/jApiRecorder</url>
 
 	<issueManagement>
 		<url>https://github.com/uscexp/jApiRecorder/issues</url>
