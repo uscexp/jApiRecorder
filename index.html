@@ -33,20 +33,20 @@
 
 <p>A dynamic proxy to record and playback API method calls e.g. for testing porposes.</p>
 
-<h1>
-<a name="features" class="anchor" href="#features"><span class="octicon octicon-link"></span></a>Features</h1>
+<h2>
+<a name="features" class="anchor" href="#features"><span class="octicon octicon-link"></span></a>Features</h2>
 
 <ul>
 <li>record and/or playback an API mathod call return value.</li>
 <li>replace attibute values of return values via dot notation attribute path on playback.</li>
 <li>manipulate replacement values before setting them to the attribute values on the recorded value.</li>
-</ul><h1>
-<a name="description" class="anchor" href="#description"><span class="octicon octicon-link"></span></a>Description</h1>
+</ul><h2>
+<a name="description" class="anchor" href="#description"><span class="octicon octicon-link"></span></a>Description</h2>
 
 <p>The jApiRecorder one can creat a dynamic proxy of a class to record/playback API method calls.</p>
 
-<h2>
-<a name="modes" class="anchor" href="#modes"><span class="octicon octicon-link"></span></a>Modes</h2>
+<h3>
+<a name="modes" class="anchor" href="#modes"><span class="octicon octicon-link"></span></a>Modes</h3>
 
 <p>There are four modes to go:</p>
 
@@ -56,8 +56,8 @@
 <li>PB_ONLINE - tries first to get a return value from the recorded data. if there is one it will be returned,
 else it calls the original method, records the return value and returns it.</li>
 <li>PB_OFFLINE - tries to get a return value from the recorded data. if there is none it will return null.</li>
-</ul><h2>
-<a name="readwritestrategy-and-contenttypestrategy" class="anchor" href="#readwritestrategy-and-contenttypestrategy"><span class="octicon octicon-link"></span></a>ReadWriteStrategy and ContentTypeStrategy</h2>
+</ul><h3>
+<a name="readwritestrategy-and-contenttypestrategy" class="anchor" href="#readwritestrategy-and-contenttypestrategy"><span class="octicon octicon-link"></span></a>ReadWriteStrategy and ContentTypeStrategy</h3>
 
 <p>It is possible to implement your own <code>ReadWriteStrategy</code> and/or <code>ContentTypeStrategy</code>.
 You only have to implement the given interfaces.</p>
@@ -68,16 +68,16 @@ You only have to implement the given interfaces.</p>
 <p>Already implemented <code>ReadWriteStrategy</code> is:
 <code>H2ReadWriteStrategy</code> which reads/writes the serialized objects to be recorded/playbacked within a H2 database (memory or file database).</p>
 
-<h2>
-<a name="attribute-replacement" class="anchor" href="#attribute-replacement"><span class="octicon octicon-link"></span></a>Attribute Replacement</h2>
+<h3>
+<a name="attribute-replacement" class="anchor" href="#attribute-replacement"><span class="octicon octicon-link"></span></a>Attribute Replacement</h3>
 
 <p>One can replace attribute values in the recorded values.
 Specify an attribute path from the recorded  result object in dot notation form (see <a href="http://uscexp.github.io/jDotNotation/">jDotNotation</a>) to the attribute one want to change. Set a fix value or use an argument passed to the method call.
 The value one want to set to an attribute in the result can be manipulated before setting it to the attribute.
 E.g. one want to change a <code>Date</code> attribute of the result and change it to the current date. One can add serveral replacement value treatments to change the value, in this example to change it to the current date.</p>
 
-<h1>
-<a name="example" class="anchor" href="#example"><span class="octicon octicon-link"></span></a>Example</h1>
+<h2>
+<a name="example" class="anchor" href="#example"><span class="octicon octicon-link"></span></a>Example</h2>
 
 <p>An example from a junit test (see more junit tests form more code examples):</p>
 
