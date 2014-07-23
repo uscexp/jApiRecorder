@@ -18,7 +18,7 @@ public class RecordInformationTest extends JUnitBase {
         int[] argIdx4Pk = { 0 };
         RecordInformation recordInformation = new RecordInformation("test", args, argIdx4Pk);
         
-        Assert.assertEquals(args, recordInformation.getArgs());
+        Assert.assertArrayEquals(args, recordInformation.getArgs());
         Assert.assertEquals("test", recordInformation.getMethodName());
         Assert.assertEquals(args[0].hashCode(), recordInformation.getReturnValueId());
     }

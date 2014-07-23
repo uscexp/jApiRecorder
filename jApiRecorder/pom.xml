@@ -4,11 +4,11 @@
 
 	<groupId>com.github.uscexp</groupId>
 	<artifactId>jApiRecorder</artifactId>
-	<version>1.0.0</version>
+	<version>1.0.1</version>
 	<packaging>jar</packaging>
 
 	<name>${project.groupId}:${project.artifactId}</name>
-	<description>A dynamic proxy to record and playback API method calls e.g. for testing porposes.</description>
+	<description>A dynamic proxy to record and replay API method calls e.g. for testing porposes.</description>
 	<url>http://uscexp.github.io/jApiRecorder</url>
 
 	<issueManagement>
@@ -159,9 +159,9 @@
 			<version>3.1</version>
 		</dependency>
 		<dependency>
-			<groupId>xstream</groupId>
+			<groupId>com.thoughtworks.xstream</groupId>
 			<artifactId>xstream</artifactId>
-			<version>1.2.2</version>
+			<version>1.4.7</version>
 		</dependency>
 		<dependency>
 			<groupId>com.h2database</groupId>

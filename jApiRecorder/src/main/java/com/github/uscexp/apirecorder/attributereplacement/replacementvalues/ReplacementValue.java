@@ -8,7 +8,7 @@ import com.github.uscexp.apirecorder.exception.ReplacementValueException;
 
 /**
  * The {@link ReplacementValue} holds/calculates the real object to replace another value
- * in the result of a (playback) method call.
+ * in the result of a (replay) method call.
  * 
  * @author haui
  *

@@ -19,7 +19,7 @@ import com.google.common.collect.Multimap;
  * of the method call which should be used to build a id for later retreivement of the result object.
  * </p>
  * <p>
- * The result values can be altered after retreiving it from the store (only on playback). To do so one have to
+ * The result values can be altered after retreiving it from the store (only on replay). To do so one have to
  * specify the {@link ReplacementConfiguration} objects with the corresponding method key.
  * See {@link AttributeValueReplacer} for more details.
  * </p>
@@ -27,7 +27,7 @@ import com.google.common.collect.Multimap;
  * @author haui
  *
  */
-public class RecordPlaybackConfiguration {
+public class RecordReplayConfiguration {
 
 	private Map<String, int[]> methodArgIdx4Pk = new HashMap<>();
 	private Multimap<String, ReplacementConfiguration> methodRelpacementConfiguration = ArrayListMultimap.create();
