@@ -20,17 +20,17 @@ import com.github.uscexp.apirecorder.readwritestrategy.ReadWriteStrategy;
  * @author haui
  *
  */
-public class RecordPlaybackManagerTest extends JUnitBase {
+public class RecordReplayManagerTest extends JUnitBase {
 
     @Test
 	public void testPBOnlineConstructorNoArgs()
 		throws Exception {
 		ContentTypeStrategy contentTypeStrategy = new XStreamContentTypeStrategy();
 		ReadWriteStrategy readWriteStrategy = new H2ReadWriteStrategy();
-		RecordPlaybackConfiguration recordPlaybackConfiguration = new RecordPlaybackConfiguration();
-		recordPlaybackConfiguration.addArgumentIndices4PrimaryKey("simpleMethod", 0, 1);
-		TestClass testClass = (TestClass) RecordPlaybackManager.newInstance(TestClass.class, RecordPlaybackMode.PB_ONLINE,
-				contentTypeStrategy, readWriteStrategy, recordPlaybackConfiguration);
+		RecordReplayConfiguration recordReplayConfiguration = new RecordReplayConfiguration();
+		recordReplayConfiguration.addArgumentIndices4PrimaryKey("simpleMethod", 0, 1);
+		TestClass testClass = (TestClass) RecordReplayManager.newInstance(TestClass.class, RecordReplayMode.RP_ONLINE,
+				contentTypeStrategy, readWriteStrategy, recordReplayConfiguration);
 
 		Date date = new Date();
 		String result = testClass.simpleMethod(2, "text2", date);
@@ -38,18 +38,19 @@ public class RecordPlaybackManagerTest extends JUnitBase {
 		Assert.assertEquals("" + 2 + "text2" + date.toString() + "intern", result);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Test
 	public void testPBOnlineConstructorWithArgs()
 		throws Exception {
 		ContentTypeStrategy contentTypeStrategy = new XStreamContentTypeStrategy();
 		ReadWriteStrategy readWriteStrategy = new H2ReadWriteStrategy();
-		RecordPlaybackConfiguration recordPlaybackConfiguration = new RecordPlaybackConfiguration();
-		recordPlaybackConfiguration.addArgumentIndices4PrimaryKey("simpleMethod", 0, 1);
+		RecordReplayConfiguration recordReplayConfiguration = new RecordReplayConfiguration();
+		recordReplayConfiguration.addArgumentIndices4PrimaryKey("simpleMethod", 0, 1);
 		Class<? extends Object>[] parameterTypes = new Class[1];
 		parameterTypes[0] = String.class;
 		Object[] args = { "extern" };
-		TestClass testClass = (TestClass) RecordPlaybackManager.newInstance(TestClass.class, parameterTypes, args,
-				RecordPlaybackMode.PB_ONLINE, contentTypeStrategy, readWriteStrategy, recordPlaybackConfiguration);
+		TestClass testClass = (TestClass) RecordReplayManager.newInstance(TestClass.class, parameterTypes, args,
+				RecordReplayMode.RP_ONLINE, contentTypeStrategy, readWriteStrategy, recordReplayConfiguration);
 
 		Date date = new Date();
 		String result = testClass.simpleMethod(1, "text1", date);
@@ -62,10 +63,10 @@ public class RecordPlaybackManagerTest extends JUnitBase {
 		throws Exception {
 		ContentTypeStrategy contentTypeStrategy = new XStreamContentTypeStrategy();
 		ReadWriteStrategy readWriteStrategy = new H2ReadWriteStrategy();
-		RecordPlaybackConfiguration recordPlaybackConfiguration = new RecordPlaybackConfiguration();
-		recordPlaybackConfiguration.addArgumentIndices4PrimaryKey("simpleMethod", 0, 1);
-		TestClass testClass = (TestClass) RecordPlaybackManager.newInstance(TestClass.class, RecordPlaybackMode.PB_OFFLINE,
-				contentTypeStrategy, readWriteStrategy, recordPlaybackConfiguration);
+		RecordReplayConfiguration recordReplayConfiguration = new RecordReplayConfiguration();
+		recordReplayConfiguration.addArgumentIndices4PrimaryKey("simpleMethod", 0, 1);
+		TestClass testClass = (TestClass) RecordReplayManager.newInstance(TestClass.class, RecordReplayMode.RP_OFFLINE,
+				contentTypeStrategy, readWriteStrategy, recordReplayConfiguration);
 
 		Date date = new Date();
 		String result = testClass.simpleMethod(4, "text4", date);
@@ -78,18 +79,18 @@ public class RecordPlaybackManagerTest extends JUnitBase {
 		throws Exception {
 		ContentTypeStrategy contentTypeStrategy = new XStreamContentTypeStrategy();
 		ReadWriteStrategy readWriteStrategy = new H2ReadWriteStrategy();
-		RecordPlaybackConfiguration recordPlaybackConfiguration = new RecordPlaybackConfiguration();
-		recordPlaybackConfiguration.addArgumentIndices4PrimaryKey("simpleMethod", 0, 1);
-		TestClass testClass = (TestClass) RecordPlaybackManager.newInstance(TestClass.class, RecordPlaybackMode.RECORD, contentTypeStrategy,
-				readWriteStrategy, recordPlaybackConfiguration);
+		RecordReplayConfiguration recordReplayConfiguration = new RecordReplayConfiguration();
+		recordReplayConfiguration.addArgumentIndices4PrimaryKey("simpleMethod", 0, 1);
+		TestClass testClass = (TestClass) RecordReplayManager.newInstance(TestClass.class, RecordReplayMode.RECORD, contentTypeStrategy,
+				readWriteStrategy, recordReplayConfiguration);
 
 		Date date = new Date();
 		String result = testClass.simpleMethod(3, "text3", date);
 
 		Assert.assertEquals("" + 3 + "text3" + date.toString() + "intern", result);
 
-		testClass = (TestClass) RecordPlaybackManager.newInstance(TestClass.class, RecordPlaybackMode.PB_OFFLINE, contentTypeStrategy,
-				readWriteStrategy, recordPlaybackConfiguration);
+		testClass = (TestClass) RecordReplayManager.newInstance(TestClass.class, RecordReplayMode.RP_OFFLINE, contentTypeStrategy,
+				readWriteStrategy, recordReplayConfiguration);
 
 		Date date2 = new Date();
 		result = testClass.simpleMethod(3, "text3", date2);
@@ -102,10 +103,10 @@ public class RecordPlaybackManagerTest extends JUnitBase {
         throws Exception {
         ContentTypeStrategy contentTypeStrategy = new XStreamContentTypeStrategy();
         ReadWriteStrategy readWriteStrategy = new H2ReadWriteStrategy();
-        RecordPlaybackConfiguration recordPlaybackConfiguration = new RecordPlaybackConfiguration();
-        recordPlaybackConfiguration.addArgumentIndices4PrimaryKey("simpleLevel2Method", 0, 1);
-        TestClass testClass = (TestClass) RecordPlaybackManager.newInstance(TestClass.class, RecordPlaybackMode.RECORD, contentTypeStrategy,
-                readWriteStrategy, recordPlaybackConfiguration);
+        RecordReplayConfiguration recordReplayConfiguration = new RecordReplayConfiguration();
+        recordReplayConfiguration.addArgumentIndices4PrimaryKey("simpleLevel2Method", 0, 1);
+        TestClass testClass = (TestClass) RecordReplayManager.newInstance(TestClass.class, RecordReplayMode.RECORD, contentTypeStrategy,
+                readWriteStrategy, recordReplayConfiguration);
 
         Date date = new Date();
         String text = "extern";
@@ -116,9 +117,9 @@ public class RecordPlaybackManagerTest extends JUnitBase {
         String value = "post_extern";
         ReplacementValue replacementValue = ReplacementValueFactory.createReplacementGivenValue(value);
         ReplacementConfiguration replacementConfiguration = new ReplacementConfiguration("text", replacementValue);
-        recordPlaybackConfiguration.addReplacementConfiguration("simpleLevel2Method", replacementConfiguration );
-        testClass = (TestClass) RecordPlaybackManager.newInstance(TestClass.class, RecordPlaybackMode.PB_OFFLINE, contentTypeStrategy,
-                readWriteStrategy, recordPlaybackConfiguration);
+        recordReplayConfiguration.addReplacementConfiguration("simpleLevel2Method", replacementConfiguration );
+        testClass = (TestClass) RecordReplayManager.newInstance(TestClass.class, RecordReplayMode.RP_OFFLINE, contentTypeStrategy,
+                readWriteStrategy, recordReplayConfiguration);
 
         Date date2 = new Date();
         result = testClass.simpleLevel2Method(3, text, date2);
@@ -131,18 +132,18 @@ public class RecordPlaybackManagerTest extends JUnitBase {
 		throws Exception {
 		ContentTypeStrategy contentTypeStrategy = new XStreamContentTypeStrategy();
 		ReadWriteStrategy readWriteStrategy = new H2ReadWriteStrategy();
-		RecordPlaybackConfiguration recordPlaybackConfiguration = new RecordPlaybackConfiguration();
-		recordPlaybackConfiguration.addArgumentIndices4PrimaryKey("simpleMethod", 0, 1);
-		TestClass testClass = (TestClass) RecordPlaybackManager.newInstance(TestClass.class, RecordPlaybackMode.FOREWARD,
-				contentTypeStrategy, readWriteStrategy, recordPlaybackConfiguration);
+		RecordReplayConfiguration recordReplayConfiguration = new RecordReplayConfiguration();
+		recordReplayConfiguration.addArgumentIndices4PrimaryKey("simpleMethod", 0, 1);
+		TestClass testClass = (TestClass) RecordReplayManager.newInstance(TestClass.class, RecordReplayMode.FOREWARD,
+				contentTypeStrategy, readWriteStrategy, recordReplayConfiguration);
 
 		Date date = new Date();
 		String result = testClass.simpleMethod(5, "text5", date);
 
 		Assert.assertEquals("" + 5 + "text5" + date.toString() + "intern", result);
 
-		testClass = (TestClass) RecordPlaybackManager.newInstance(TestClass.class, RecordPlaybackMode.PB_OFFLINE, contentTypeStrategy,
-				readWriteStrategy, recordPlaybackConfiguration);
+		testClass = (TestClass) RecordReplayManager.newInstance(TestClass.class, RecordReplayMode.RP_OFFLINE, contentTypeStrategy,
+				readWriteStrategy, recordReplayConfiguration);
 
 		Date date2 = new Date();
 		result = testClass.simpleMethod(5, "text5", date2);
@@ -156,7 +157,7 @@ public class RecordPlaybackManagerTest extends JUnitBase {
 		ContentTypeStrategy contentTypeStrategy = new XStreamContentTypeStrategy();
 		ReadWriteStrategy readWriteStrategy = new H2ReadWriteStrategy();
 
-		TestClass testClass = (TestClass) RecordPlaybackManager.newInstance(TestClass.class, RecordPlaybackMode.RECORD, contentTypeStrategy,
+		TestClass testClass = (TestClass) RecordReplayManager.newInstance(TestClass.class, RecordReplayMode.RECORD, contentTypeStrategy,
 				readWriteStrategy, null);
 
 		Date date = new Date();
@@ -164,7 +165,7 @@ public class RecordPlaybackManagerTest extends JUnitBase {
 
 		Assert.assertEquals("" + 6 + "text6" + date.toString() + "intern", result);
 
-		testClass = (TestClass) RecordPlaybackManager.newInstance(TestClass.class, RecordPlaybackMode.PB_OFFLINE, contentTypeStrategy,
+		testClass = (TestClass) RecordReplayManager.newInstance(TestClass.class, RecordReplayMode.RP_OFFLINE, contentTypeStrategy,
 				readWriteStrategy, null);
 
 		result = testClass.simpleMethod(6, "text6", date);
