@@ -7,6 +7,6 @@ package com.github.uscexp.apirecorder;
  * @author haui
  *
  */
-public enum RecordPlaybackMode {
-	FOREWARD,RECORD,PB_ONLINE,PB_OFFLINE;
+public enum RecordReplayMode {
+	FOREWARD,RECORD,RP_ONLINE,RP_OFFLINE;
 }
