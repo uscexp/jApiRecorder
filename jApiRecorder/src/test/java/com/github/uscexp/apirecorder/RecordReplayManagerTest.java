@@ -3,9 +3,12 @@
  */
 package com.github.uscexp.apirecorder;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import java.util.Date;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import com.github.uscexp.apirecorder.attributereplacement.ReplacementConfiguration;
@@ -13,6 +16,9 @@ import com.github.uscexp.apirecorder.attributereplacement.replacementvalues.Repl
 import com.github.uscexp.apirecorder.attributereplacement.replacementvalues.ReplacementValueFactory;
 import com.github.uscexp.apirecorder.contenttypestrategy.ContentTypeStrategy;
 import com.github.uscexp.apirecorder.contenttypestrategy.XStreamContentTypeStrategy;
+import com.github.uscexp.apirecorder.latencysimulation.LatencyConfiguration;
+import com.github.uscexp.apirecorder.latencysimulation.LatencyData;
+import com.github.uscexp.apirecorder.latencysimulation.Trace;
 import com.github.uscexp.apirecorder.readwritestrategy.H2ReadWriteStrategy;
 import com.github.uscexp.apirecorder.readwritestrategy.ReadWriteStrategy;
 
@@ -23,11 +29,11 @@ import com.github.uscexp.apirecorder.readwritestrategy.ReadWriteStrategy;
 public class RecordReplayManagerTest extends JUnitBase {
 
     @Test
-	public void testPBOnlineConstructorNoArgs()
+	public void testRPOnlineConstructorNoArgs()
 		throws Exception {
 		ContentTypeStrategy contentTypeStrategy = new XStreamContentTypeStrategy();
 		ReadWriteStrategy readWriteStrategy = new H2ReadWriteStrategy();
-		RecordReplayConfiguration recordReplayConfiguration = new RecordReplayConfiguration();
+		RecordReplayConfiguration recordReplayConfiguration = new RecordReplayConfiguration(false);
 		recordReplayConfiguration.addArgumentIndices4PrimaryKey("simpleMethod", 0, 1);
 		TestClass testClass = (TestClass) RecordReplayManager.newInstance(TestClass.class, RecordReplayMode.RP_ONLINE,
 				contentTypeStrategy, readWriteStrategy, recordReplayConfiguration);
@@ -35,16 +41,16 @@ public class RecordReplayManagerTest extends JUnitBase {
 		Date date = new Date();
 		String result = testClass.simpleMethod(2, "text2", date);
 
-		Assert.assertEquals("" + 2 + "text2" + date.toString() + "intern", result);
+		assertEquals("" + 2 + "text2" + date.toString() + "intern", result);
 	}
 
 	@SuppressWarnings("unchecked")
 	@Test
-	public void testPBOnlineConstructorWithArgs()
+	public void testRPOnlineConstructorWithArgs()
 		throws Exception {
 		ContentTypeStrategy contentTypeStrategy = new XStreamContentTypeStrategy();
 		ReadWriteStrategy readWriteStrategy = new H2ReadWriteStrategy();
-		RecordReplayConfiguration recordReplayConfiguration = new RecordReplayConfiguration();
+		RecordReplayConfiguration recordReplayConfiguration = new RecordReplayConfiguration(false);
 		recordReplayConfiguration.addArgumentIndices4PrimaryKey("simpleMethod", 0, 1);
 		Class<? extends Object>[] parameterTypes = new Class[1];
 		parameterTypes[0] = String.class;
@@ -55,15 +61,15 @@ public class RecordReplayManagerTest extends JUnitBase {
 		Date date = new Date();
 		String result = testClass.simpleMethod(1, "text1", date);
 
-		Assert.assertEquals("" + 1 + "text1" + date.toString() + args[0], result);
+		assertEquals("" + 1 + "text1" + date.toString() + args[0], result);
 	}
 
 	@Test
-	public void testPBOffline()
+	public void testRPOffline()
 		throws Exception {
 		ContentTypeStrategy contentTypeStrategy = new XStreamContentTypeStrategy();
 		ReadWriteStrategy readWriteStrategy = new H2ReadWriteStrategy();
-		RecordReplayConfiguration recordReplayConfiguration = new RecordReplayConfiguration();
+		RecordReplayConfiguration recordReplayConfiguration = new RecordReplayConfiguration(false);
 		recordReplayConfiguration.addArgumentIndices4PrimaryKey("simpleMethod", 0, 1);
 		TestClass testClass = (TestClass) RecordReplayManager.newInstance(TestClass.class, RecordReplayMode.RP_OFFLINE,
 				contentTypeStrategy, readWriteStrategy, recordReplayConfiguration);
@@ -71,23 +77,24 @@ public class RecordReplayManagerTest extends JUnitBase {
 		Date date = new Date();
 		String result = testClass.simpleMethod(4, "text4", date);
 
-		Assert.assertNull(result);
+		assertNull(result);
 	}
 
 	@Test
-	public void testRecordPBOffline()
+	public void testRecordRPOffline()
 		throws Exception {
 		ContentTypeStrategy contentTypeStrategy = new XStreamContentTypeStrategy();
 		ReadWriteStrategy readWriteStrategy = new H2ReadWriteStrategy();
-		RecordReplayConfiguration recordReplayConfiguration = new RecordReplayConfiguration();
+		RecordReplayConfiguration recordReplayConfiguration = new RecordReplayConfiguration(false);
 		recordReplayConfiguration.addArgumentIndices4PrimaryKey("simpleMethod", 0, 1);
 		TestClass testClass = (TestClass) RecordReplayManager.newInstance(TestClass.class, RecordReplayMode.RECORD, contentTypeStrategy,
 				readWriteStrategy, recordReplayConfiguration);
 
 		Date date = new Date();
-		String result = testClass.simpleMethod(3, "text3", date);
+		int i = 3;
+		String result = testClass.simpleMethod(i, "text3", date);
 
-		Assert.assertEquals("" + 3 + "text3" + date.toString() + "intern", result);
+		assertEquals("" + i + "text3" + date.toString() + "intern", result);
 
 		testClass = (TestClass) RecordReplayManager.newInstance(TestClass.class, RecordReplayMode.RP_OFFLINE, contentTypeStrategy,
 				readWriteStrategy, recordReplayConfiguration);
@@ -95,15 +102,155 @@ public class RecordReplayManagerTest extends JUnitBase {
 		Date date2 = new Date();
 		result = testClass.simpleMethod(3, "text3", date2);
 
-		Assert.assertEquals("" + 3 + "text3" + date.toString() + "intern", result);
+		assertEquals("" + i + "text3" + date.toString() + "intern", result);
+	}
+
+	@Test
+	public void testRPOnlineWithLatencySimulation()
+		throws Exception {
+		ContentTypeStrategy contentTypeStrategy = new XStreamContentTypeStrategy();
+		ReadWriteStrategy readWriteStrategy = new H2ReadWriteStrategy();
+		LatencyConfiguration latencyConfiguration = new LatencyConfiguration(1, 3, false);
+		RecordReplayConfiguration recordReplayConfiguration = new RecordReplayConfiguration(latencyConfiguration , true);
+		recordReplayConfiguration.addArgumentIndices4PrimaryKey("simpleMethod", 0);
+		TestClass testClass = (TestClass) RecordReplayManager.newInstance(TestClass.class, RecordReplayMode.RP_ONLINE, contentTypeStrategy,
+				readWriteStrategy, recordReplayConfiguration);
+
+		Date date = new Date();
+		String text = "text3";
+		int i = 8;
+		String result = testClass.simpleMethod(i, text, date);
+		
+		int id = new Integer(i).hashCode() * 31;
+		LatencyData latencyData = readWriteStrategy.readLatency(id);
+
+		assertEquals("" + i + text + date.toString() + "intern", result);
+		int latency = RecordInformation.calculateLatency(latencyConfiguration, latencyData);
+		assertTrue(latency > TestClass.getMethodLatency() * 2);
+		
+		result = testClass.simpleMethod(i, text, date);
+		
+		latencyData = readWriteStrategy.readLatency(id);
+
+		assertTrue(latency > RecordInformation.calculateLatency(latencyConfiguration, latencyData));
+		latency = RecordInformation.calculateLatency(latencyConfiguration, latencyData);
+		assertTrue(latency > TestClass.getMethodLatency());
+		assertTrue(latency < TestClass.getMethodLatency() * 2);
+		
+		result = testClass.simpleMethod(i, text, date);
+		
+		latencyData = readWriteStrategy.readLatency(id);
+
+		latency = RecordInformation.calculateLatency(latencyConfiguration, latencyData);
+		assertTrue(latency > TestClass.getMethodLatency());
+		assertTrue(latency < TestClass.getMethodLatency() * 2);
+	}
+
+	@Test
+	public void testRPOnlineWithLatencySimulationAndRecordAtOnce()
+		throws Exception {
+		ContentTypeStrategy contentTypeStrategy = new XStreamContentTypeStrategy();
+		ReadWriteStrategy readWriteStrategy = new H2ReadWriteStrategy();
+		LatencyConfiguration latencyConfiguration = new LatencyConfiguration(1, 3, true);
+		RecordReplayConfiguration recordReplayConfiguration = new RecordReplayConfiguration(latencyConfiguration , true);
+		recordReplayConfiguration.addArgumentIndices4PrimaryKey("simpleMethod", 0);
+		TestClass testClass = (TestClass) RecordReplayManager.newInstance(TestClass.class, RecordReplayMode.RP_ONLINE, contentTypeStrategy,
+				readWriteStrategy, recordReplayConfiguration);
+
+		Date date = new Date();
+		String text = "text3";
+		int i = 9;
+		Trace trace = new Trace();
+		String result = testClass.simpleMethod(i, text, date);
+		int delay = (int) trace.getDuration();
+		
+		assertTrue(delay > TestClass.getMethodLatency() * 5);
+		
+		LatencyData latencyData = readWriteStrategy.readLatency(new Integer(i).hashCode() * 31);
+
+		assertEquals("" + i + text + date.toString() + "intern", result);
+		int latency = RecordInformation.calculateLatency(latencyConfiguration, latencyData);
+		assertTrue(latency > TestClass.getMethodLatency());
+	}
+
+	@Test
+	public void testRPOnlineWithLatencySimulationStaticDeleay()
+		throws Exception {
+		ContentTypeStrategy contentTypeStrategy = new XStreamContentTypeStrategy();
+		ReadWriteStrategy readWriteStrategy = new H2ReadWriteStrategy();
+		LatencyConfiguration latencyConfiguration = new LatencyConfiguration(200);
+		RecordReplayConfiguration recordReplayConfiguration = new RecordReplayConfiguration(latencyConfiguration , true);
+		recordReplayConfiguration.addArgumentIndices4PrimaryKey("simpleMethod", 0);
+		TestClass testClass = (TestClass) RecordReplayManager.newInstance(TestClass.class, RecordReplayMode.RP_ONLINE, contentTypeStrategy,
+				readWriteStrategy, recordReplayConfiguration);
+
+		Date date = new Date();
+		String text = "text3";
+		int i = 10;
+		Trace trace = new Trace();
+		String result = testClass.simpleMethod(i, text, date);
+		int delay = (int) trace.getDuration();
+		
+		assertTrue(delay > 200);
+		
+		LatencyData latencyData = readWriteStrategy.readLatency(new Integer(i).hashCode() * 31);
+
+		assertEquals("" + i + text + date.toString() + "intern", result);
+		int latency = RecordInformation.calculateLatency(latencyConfiguration, latencyData);
+		assertTrue(latency == 200);
+	}
+
+
+	@Test
+	public void testRPOnlineWithoutLatencyConfigurationButLatencySimulationActivated()
+		throws Exception {
+		ContentTypeStrategy contentTypeStrategy = new XStreamContentTypeStrategy();
+		ReadWriteStrategy readWriteStrategy = new H2ReadWriteStrategy();
+		RecordReplayConfiguration recordReplayConfiguration = new RecordReplayConfiguration(true);
+		recordReplayConfiguration.addArgumentIndices4PrimaryKey("simpleMethod", 0);
+		TestClass testClass = (TestClass) RecordReplayManager.newInstance(TestClass.class, RecordReplayMode.RP_ONLINE, contentTypeStrategy,
+				readWriteStrategy, recordReplayConfiguration);
+
+		Date date = new Date();
+		String text = "text3";
+		int i = 11;
+		testClass.simpleMethod(i, text, date);
+		
+		LatencyData latencyData = readWriteStrategy.readLatency(new Integer(i).hashCode() * 31);
+
+		LatencyConfiguration latencyConfiguration = recordReplayConfiguration.getLatencyConfiguration("simpleMethod");
+		int latency = RecordInformation.calculateLatency(latencyConfiguration, latencyData);
+		assertTrue(latency == 0);
+	}
+
+	@Test
+	public void testRecordTwice()
+		throws Exception {
+		ContentTypeStrategy contentTypeStrategy = new XStreamContentTypeStrategy();
+		ReadWriteStrategy readWriteStrategy = new H2ReadWriteStrategy();
+		RecordReplayConfiguration recordReplayConfiguration = new RecordReplayConfiguration(false);
+		recordReplayConfiguration.addArgumentIndices4PrimaryKey("simpleMethod", 0, 1);
+		TestClass testClass = (TestClass) RecordReplayManager.newInstance(TestClass.class, RecordReplayMode.RECORD, contentTypeStrategy,
+				readWriteStrategy, recordReplayConfiguration);
+
+		Date date = new Date();
+		int i = 7;
+		String text = "text3";
+		String result = testClass.simpleMethod(i, text, date);
+
+		assertEquals("" + i + text + date.toString() + "intern", result);
+
+		result = testClass.simpleMethod(i, text, date);
+
+		assertEquals("" + i + text + date.toString() + "intern", result);
 	}
 
     @Test
-    public void testRecordPBOfflineWithAttributeReplacement()
+    public void testRecordRPOfflineWithAttributeReplacement()
         throws Exception {
         ContentTypeStrategy contentTypeStrategy = new XStreamContentTypeStrategy();
         ReadWriteStrategy readWriteStrategy = new H2ReadWriteStrategy();
-        RecordReplayConfiguration recordReplayConfiguration = new RecordReplayConfiguration();
+        RecordReplayConfiguration recordReplayConfiguration = new RecordReplayConfiguration(false);
         recordReplayConfiguration.addArgumentIndices4PrimaryKey("simpleLevel2Method", 0, 1);
         TestClass testClass = (TestClass) RecordReplayManager.newInstance(TestClass.class, RecordReplayMode.RECORD, contentTypeStrategy,
                 readWriteStrategy, recordReplayConfiguration);
@@ -112,7 +259,7 @@ public class RecordReplayManagerTest extends JUnitBase {
         String text = "extern";
         TestClass result = testClass.simpleLevel2Method(3, text, date);
 
-        Assert.assertEquals(text, result.getText());
+        assertEquals(text, result.getText());
 
         String value = "post_extern";
         ReplacementValue replacementValue = ReplacementValueFactory.createReplacementGivenValue(value);
@@ -124,7 +271,7 @@ public class RecordReplayManagerTest extends JUnitBase {
         Date date2 = new Date();
         result = testClass.simpleLevel2Method(3, text, date2);
 
-        Assert.assertEquals(value, result.getText());
+        assertEquals(value, result.getText());
     }
 
 	@Test
@@ -132,27 +279,29 @@ public class RecordReplayManagerTest extends JUnitBase {
 		throws Exception {
 		ContentTypeStrategy contentTypeStrategy = new XStreamContentTypeStrategy();
 		ReadWriteStrategy readWriteStrategy = new H2ReadWriteStrategy();
-		RecordReplayConfiguration recordReplayConfiguration = new RecordReplayConfiguration();
+		RecordReplayConfiguration recordReplayConfiguration = new RecordReplayConfiguration(false);
 		recordReplayConfiguration.addArgumentIndices4PrimaryKey("simpleMethod", 0, 1);
 		TestClass testClass = (TestClass) RecordReplayManager.newInstance(TestClass.class, RecordReplayMode.FOREWARD,
 				contentTypeStrategy, readWriteStrategy, recordReplayConfiguration);
 
 		Date date = new Date();
-		String result = testClass.simpleMethod(5, "text5", date);
+		int i = 5;
+		String text = "text7";
+		String result = testClass.simpleMethod(i, text, date);
 
-		Assert.assertEquals("" + 5 + "text5" + date.toString() + "intern", result);
+		assertEquals("" + i + text + date.toString() + "intern", result);
 
 		testClass = (TestClass) RecordReplayManager.newInstance(TestClass.class, RecordReplayMode.RP_OFFLINE, contentTypeStrategy,
 				readWriteStrategy, recordReplayConfiguration);
 
 		Date date2 = new Date();
-		result = testClass.simpleMethod(5, "text5", date2);
+		result = testClass.simpleMethod(i, text, date2);
 
-		Assert.assertNull(result);
+		assertNull(result);
 	}
 
 	@Test
-	public void testRecordPBOfflineConfigNo()
+	public void testRecordRPOfflineConfigNo()
 		throws Exception {
 		ContentTypeStrategy contentTypeStrategy = new XStreamContentTypeStrategy();
 		ReadWriteStrategy readWriteStrategy = new H2ReadWriteStrategy();
@@ -163,13 +312,13 @@ public class RecordReplayManagerTest extends JUnitBase {
 		Date date = new Date();
 		String result = testClass.simpleMethod(6, "text6", date);
 
-		Assert.assertEquals("" + 6 + "text6" + date.toString() + "intern", result);
+		assertEquals("" + 6 + "text6" + date.toString() + "intern", result);
 
 		testClass = (TestClass) RecordReplayManager.newInstance(TestClass.class, RecordReplayMode.RP_OFFLINE, contentTypeStrategy,
 				readWriteStrategy, null);
 
 		result = testClass.simpleMethod(6, "text6", date);
 
-		Assert.assertEquals("" + 6 + "text6" + date.toString() + "intern", result);
+		assertEquals("" + 6 + "text6" + date.toString() + "intern", result);
 	}
 }
