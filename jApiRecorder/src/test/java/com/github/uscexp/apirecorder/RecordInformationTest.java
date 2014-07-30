@@ -3,8 +3,16 @@
  */
 package com.github.uscexp.apirecorder;
 
-import org.junit.Assert;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import org.junit.Test;
+
+import com.github.uscexp.apirecorder.latencysimulation.LatencyConfiguration;
+import com.github.uscexp.apirecorder.latencysimulation.LatencyData;
+import com.github.uscexp.apirecorder.readwritestrategy.H2ReadWriteStrategy;
+import com.github.uscexp.apirecorder.readwritestrategy.ReadWriteStrategy;
 
 /**
  * @author haui
@@ -18,11 +26,45 @@ public class RecordInformationTest extends JUnitBase {
         int[] argIdx4Pk = { 0 };
         RecordInformation recordInformation = new RecordInformation("test", args, argIdx4Pk);
         
-        Assert.assertArrayEquals(args, recordInformation.getArgs());
-        Assert.assertEquals("test", recordInformation.getMethodName());
-        Assert.assertEquals(args[0].hashCode(), recordInformation.getReturnValueId());
+        assertArrayEquals(args, recordInformation.getArgs());
+        assertEquals("test", recordInformation.getMethodName());
+        assertEquals(args[0].hashCode() * 31, recordInformation.getReturnValueId());
     }
 
+    @Test
+    public void testRecordInformationWithConfig() throws Exception {
+        Object[] args = { "a", "b" };
+		RecordReplayConfiguration recordReplayConfiguration = new RecordReplayConfiguration(true);
+		recordReplayConfiguration.addArgumentIndices4PrimaryKey("test", 0);
+        ReadWriteStrategy readWriteStrategy = new H2ReadWriteStrategy();
+		RecordInformation recordInformation = new RecordInformation("test", args, recordReplayConfiguration, readWriteStrategy );
+        
+        assertArrayEquals(args, recordInformation.getArgs());
+        assertEquals("test", recordInformation.getMethodName());
+        assertEquals(args[0].hashCode() * 31, recordInformation.getReturnValueId());
+        assertNotNull(recordInformation.getLatencyData());
+    }
+
+
+    @Test
+    public void testRecordInformationWithConfigAndExistingLatencyData() throws Exception {
+        Object[] args = { "a", "b" };
+        LatencyConfiguration latencyConfiguration = new LatencyConfiguration(1);
+		RecordReplayConfiguration recordReplayConfiguration = new RecordReplayConfiguration(latencyConfiguration , true);
+		recordReplayConfiguration.addArgumentIndices4PrimaryKey("test", 0);
+        ReadWriteStrategy readWriteStrategy = new H2ReadWriteStrategy();
+        LatencyData latencyData = new LatencyData();
+        latencyData.setNumberOfCyclesIgnored(1);
+        latencyData.getLatencies().add(1);
+        readWriteStrategy.writeLatency(args[0].hashCode() * 31, latencyData);
+		RecordInformation recordInformation = new RecordInformation("test", args, recordReplayConfiguration, readWriteStrategy );
+        
+        assertArrayEquals(args, recordInformation.getArgs());
+        assertEquals("test", recordInformation.getMethodName());
+        assertEquals(args[0].hashCode() * 31, recordInformation.getReturnValueId());
+        assertNotNull(recordInformation.getLatencyData());
+        assertEquals(latencyData, recordInformation.getLatencyData());
+    }
     @Test
     public void testGetReturnValue() throws Exception {
         Object[] args = { "a", "b" };
@@ -33,7 +75,7 @@ public class RecordInformationTest extends JUnitBase {
         
         Object result = recordInformation.getReturnValue();
         
-        Assert.assertEquals("test", result);
+        assertEquals("test", result);
     }
 
     @Test
@@ -48,9 +90,9 @@ public class RecordInformationTest extends JUnitBase {
        
         long current = 0;
         for (int i = 0; i < args.length; i++) {
-            current += args[i].hashCode();
+            current += args[i].hashCode() * 31;
         }
-        Assert.assertEquals(current, result);
+        assertEquals(current, result);
     }
 
     @Test(expected = IllegalArgumentException.class)

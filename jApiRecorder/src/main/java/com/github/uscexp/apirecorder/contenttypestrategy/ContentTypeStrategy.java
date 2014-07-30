@@ -7,16 +7,30 @@ import com.github.uscexp.apirecorder.exception.ContentTypeStrategyException;
 
 /**
  * The {@link ContentTypeStrategy} provides the logic to serialize and deserialize the objects.
- * 
+ *
  * @author haui
  *
  */
 public interface ContentTypeStrategy {
 
-	public abstract String serialize(Object object)
+	/**
+	 * serializes an object with given strategy.
+	 *
+	 * @param object to be serialized.
+	 * @return serialized object.
+	 * @throws ContentTypeStrategyException on error.
+	 */
+	String serialize(Object object)
 		throws ContentTypeStrategyException;
 
-	public abstract Object deserialize(String serializedObject)
+	/**
+	 * deserializes a serialized object with a given strategy.
+	 *
+	 * @param serializedObject serialized object.
+	 * @return deserialized object.
+	 * @throws ContentTypeStrategyException on error.
+	 */
+	Object deserialize(String serializedObject)
 		throws ContentTypeStrategyException;
 
 }
