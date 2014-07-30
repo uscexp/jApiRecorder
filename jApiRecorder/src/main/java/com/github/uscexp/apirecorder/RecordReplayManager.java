@@ -20,6 +20,9 @@ import com.github.uscexp.apirecorder.exception.ContentTypeStrategyException;
 import com.github.uscexp.apirecorder.exception.ReadWriteStrategyException;
 import com.github.uscexp.apirecorder.exception.RecordReplayException;
 import com.github.uscexp.apirecorder.exception.ReplacementValueException;
+import com.github.uscexp.apirecorder.latencysimulation.LatencyConfiguration;
+import com.github.uscexp.apirecorder.latencysimulation.LatencyType;
+import com.github.uscexp.apirecorder.latencysimulation.Trace;
 import com.github.uscexp.apirecorder.readwritestrategy.H2ReadWriteStrategy;
 import com.github.uscexp.apirecorder.readwritestrategy.ReadWriteStrategy;
 import com.github.uscexp.dotnotation.exception.AttributeAccessExeption;
@@ -77,8 +80,7 @@ public class RecordReplayManager extends Enhancer implements MethodInterceptor {
 	public static Object newInstance(Class<? extends Object> classToProxy, RecordReplayMode recordReplayMode,
 			ContentTypeStrategy contentTypeStrategy, ReadWriteStrategy readWriteStrategy,
 			RecordReplayConfiguration recordReplayConfiguration) {
-		return
-			newInstance(classToProxy, null, null, recordReplayMode, contentTypeStrategy, readWriteStrategy, recordReplayConfiguration);
+		return newInstance(classToProxy, null, null, recordReplayMode, contentTypeStrategy, readWriteStrategy, recordReplayConfiguration);
 	}
 
 	/**
@@ -114,7 +116,7 @@ public class RecordReplayManager extends Enhancer implements MethodInterceptor {
 		this.contentTypeStrategy = contentTypeStrategy;
 		this.readWriteStrategy = readWriteStrategy;
 		if (recordReplayConfiguration == null) {
-			this.recordReplayConfiguration = new RecordReplayConfiguration();
+			this.recordReplayConfiguration = new RecordReplayConfiguration(false);
 		} else {
 			this.recordReplayConfiguration = recordReplayConfiguration;
 		}
@@ -148,18 +150,31 @@ public class RecordReplayManager extends Enhancer implements MethodInterceptor {
 					recordInformation = replay(obj, method, args, proxy);
 					break;
 			}
-		} catch (ContentTypeStrategyException | ReadWriteStrategyException | AttributeAccessExeption | ReplacementValueException e) {
+		} catch (ContentTypeStrategyException | ReadWriteStrategyException | AttributeAccessExeption | ReplacementValueException |
+				InterruptedException e) {
 			throw new RecordReplayException("Unexpected exception in RecordReplayManager", e);
 		}
 		return recordInformation.getReturnValue();
 	}
 
 	private RecordInformation replay(Object obj, Method method, Object[] args, MethodProxy proxy)
-		throws ReadWriteStrategyException, ContentTypeStrategyException, AttributeAccessExeption, ReplacementValueException {
-		RecordInformation result = new RecordInformation(method.getName(), args,
-				recordReplayConfiguration.getArgumentIndices4PrimaryKey(method.getName()));
+		throws ReadWriteStrategyException, ContentTypeStrategyException, AttributeAccessExeption, ReplacementValueException,
+			InterruptedException {
+		RecordInformation result = null;
+		if (recordReplayConfiguration.isSimulateLatency()) {
+			result = new RecordInformation(method.getName(), args, recordReplayConfiguration, readWriteStrategy);
+			if ((recordReplayMode == RecordReplayMode.RP_ONLINE) &&
+					(result.getLatencyData().getLatencies().size() <
+						recordReplayConfiguration.getLatencyConfiguration(method.getName()).getNumberOfCycles()))
+				return result;
+		} else {
+			result = new RecordInformation(method.getName(), args,
+					recordReplayConfiguration.getArgumentIndices4PrimaryKey(method.getName()));
+		}
 		logStep(method, args, "replay...");
 		String serializedObject = readWriteStrategy.read(result.getReturnValueId());
+		if (recordReplayConfiguration.isSimulateLatency())
+			Thread.sleep(result.calculateLatency());
 		if (serializedObject != null) {
 			Object object = contentTypeStrategy.deserialize(serializedObject);
 			if (object != null) {
@@ -185,15 +200,35 @@ public class RecordReplayManager extends Enhancer implements MethodInterceptor {
 		logger.log(LOG_LEVEL, message);
 		String serializedObject = contentTypeStrategy.serialize(recordInformation.getReturnValue());
 		readWriteStrategy.write(recordInformation.getReturnValueId(), serializedObject);
+		if (recordReplayConfiguration.isSimulateLatency()) {
+			readWriteStrategy.writeLatency(recordInformation.getReturnValueId(), recordInformation.getLatencyData());
+		}
 	}
 
 	private RecordInformation foreward(Object obj, Method method, Object[] args, MethodProxy proxy) {
 		RecordInformation result = null;
 		try {
 			logStep(method, args, "forewarding...");
-			Object methodResult = proxy.invokeSuper(obj, args);
-			result = new RecordInformation(method.getName(), args,
-					recordReplayConfiguration.getArgumentIndices4PrimaryKey(method.getName()));
+			Object methodResult = null;
+			if (recordReplayConfiguration.isSimulateLatency()) {
+				LatencyConfiguration latencyConfiguration = recordReplayConfiguration.getLatencyConfiguration(method.getName());
+				int cycles = 1;
+				int ignoreFirstNumberOfCycles = latencyConfiguration.getIgnoreFirstNumberOfCycles();
+				ignoreFirstNumberOfCycles = (ignoreFirstNumberOfCycles < 0) ? 0 : latencyConfiguration.getIgnoreFirstNumberOfCycles();
+				if (latencyConfiguration.isRecordAtOnce() && (latencyConfiguration.getLatencyType() == LatencyType.CYCLES_CALCULATED_DELAY))
+					cycles = latencyConfiguration.getNumberOfCycles() + ignoreFirstNumberOfCycles;
+				result = new RecordInformation(method.getName(), args, recordReplayConfiguration, readWriteStrategy);
+				for (int i = 0; i < cycles; i++) {
+					Trace trace = new Trace();
+					methodResult = proxy.invokeSuper(obj, args);
+					int latency = (int) trace.getDuration();
+					result.addLatency(latency);
+				}
+			} else {
+				result = new RecordInformation(method.getName(), args,
+						recordReplayConfiguration.getArgumentIndices4PrimaryKey(method.getName()));
+				methodResult = proxy.invokeSuper(obj, args);
+			}
 			result.setReturnValue(methodResult);
 		} catch (Throwable e) {
 			logger.log(ERROR_LOG_LEVEL, e.getMessage(), e);
