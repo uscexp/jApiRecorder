@@ -34,16 +34,22 @@
 <p>A dynamic proxy to record and replay API method calls e.g. for testing porposes.</p>
 
 <h2>
+<a name="news" class="anchor" href="#news"><span class="octicon octicon-link"></span></a>News</h2>
+
+<p>30.Jul.2014: New release <a href="https://github.com/uscexp/jApiRecorder/releases/tag/v1.1.0">v1.1.0</a> which adds the new feature of latency simulation.</p>
+
+<h2>
 <a name="features" class="anchor" href="#features"><span class="octicon octicon-link"></span></a>Features</h2>
 
 <ul>
 <li>record and/or replay an API method call return value.</li>
 <li>replace attibute values of return values via dot notation attribute path on replay.</li>
 <li>manipulate replacement values before setting them to the attribute values on the recorded value.</li>
+<li>simulate method call latency on replay.</li>
 </ul><h2>
 <a name="description" class="anchor" href="#description"><span class="octicon octicon-link"></span></a>Description</h2>
 
-<p>The jApiRecorder one can creat a dynamic proxy of a class to record/replay API method calls.</p>
+<p>With jApiRecorder one can creat a dynamic proxy of a class to record/replay API method calls.</p>
 
 <h3>
 <a name="modes" class="anchor" href="#modes"><span class="octicon octicon-link"></span></a>Modes</h3>
@@ -75,6 +81,12 @@ You only have to implement the given interfaces.</p>
 Specify an attribute path from the recorded  result object in dot notation form (see <a href="http://uscexp.github.io/jDotNotation/">jDotNotation</a>) to the attribute one want to change. Set a fix value or use an argument passed to the method call.
 The value one want to set to an attribute in the result can be manipulated before setting it to the attribute.
 E.g. one want to change a <code>Date</code> attribute of the result and change it to the current date. One can add serveral replacement value treatments to change the value, in this example to change it to the current date.</p>
+
+<h3>
+<a name="latency-simulation" class="anchor" href="#latency-simulation"><span class="octicon octicon-link"></span></a>Latency Simulation</h3>
+
+<p>It is possible to configure latency simulation, real measured or static delay, globally and/or per method call.
+For real measured latancy simulation one can define how many method calls should be measured to calculate the latency, how many method calls should be skipped (e.g. caching effects) and should the measures be made in one run (at once) or should it be done over several method calls.</p>
 
 <h2>
 <a name="example" class="anchor" href="#example"><span class="octicon octicon-link"></span></a>Example</h2>
