@@ -85,11 +85,11 @@ public class RecordInformation {
 
 		if ((argIdx4Pk != null) && (argIdx4Pk.length > 0)) {
 			for (int i = 0; i < argIdx4Pk.length; i++) {
-				result += args[argIdx4Pk[i]].hashCode() * 31;
+				result += args[argIdx4Pk[i]].hashCode() * 31L;
 			}
 		} else {
 			for (int i = 0; i < args.length; i++) {
-				result += args[i].hashCode() * 31;
+				result += args[i].hashCode() * 31L;
 			}
 		}
 

@@ -196,7 +196,7 @@ public class RecordReplayManager extends Enhancer implements MethodInterceptor {
 		if (recordInformation.getReturnValue() != null) {
 			type = recordInformation.getReturnValue().getClass().getSimpleName();
 		}
-		String message = String.format("recording... ReturnValueId: %s; ReturnValue type: %s", recordInformation.getReturnValueId(), type);
+		String message = String.format("recording... ReturnValueId: %d; ReturnValue type: %s", recordInformation.getReturnValueId(), type);
 		logger.log(LOG_LEVEL, message);
 		String serializedObject = contentTypeStrategy.serialize(recordInformation.getReturnValue());
 		readWriteStrategy.write(recordInformation.getReturnValueId(), serializedObject);
