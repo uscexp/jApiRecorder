@@ -126,7 +126,7 @@ public class RecordReplayManagerTest extends JUnitBase {
 
 		assertEquals("" + i + text + date.toString() + "intern", result);
 		int latency = RecordInformation.calculateLatency(latencyConfiguration, latencyData);
-		assertTrue(latency > TestClass.getMethodLatency() * 2);
+		assertTrue(latency >= TestClass.getMethodLatency() * 2);
 		
 		result = testClass.simpleMethod(i, text, date);
 		
@@ -134,7 +134,7 @@ public class RecordReplayManagerTest extends JUnitBase {
 
 		assertTrue(latency > RecordInformation.calculateLatency(latencyConfiguration, latencyData));
 		latency = RecordInformation.calculateLatency(latencyConfiguration, latencyData);
-		assertTrue(latency > TestClass.getMethodLatency());
+		assertTrue(latency >= TestClass.getMethodLatency());
 		assertTrue(latency < TestClass.getMethodLatency() * 2);
 		
 		result = testClass.simpleMethod(i, text, date);
@@ -142,7 +142,7 @@ public class RecordReplayManagerTest extends JUnitBase {
 		latencyData = readWriteStrategy.readLatency(id);
 
 		latency = RecordInformation.calculateLatency(latencyConfiguration, latencyData);
-		assertTrue(latency > TestClass.getMethodLatency());
+		assertTrue(latency >= TestClass.getMethodLatency());
 		assertTrue(latency < TestClass.getMethodLatency() * 2);
 	}
 
@@ -164,13 +164,13 @@ public class RecordReplayManagerTest extends JUnitBase {
 		String result = testClass.simpleMethod(i, text, date);
 		int delay = (int) trace.getDuration();
 		
-		assertTrue(delay > TestClass.getMethodLatency() * 5);
+		assertTrue(delay >= TestClass.getMethodLatency() * 5);
 		
 		LatencyData latencyData = readWriteStrategy.readLatency(new Integer(i).hashCode() * 31);
 
 		assertEquals("" + i + text + date.toString() + "intern", result);
 		int latency = RecordInformation.calculateLatency(latencyConfiguration, latencyData);
-		assertTrue(latency > TestClass.getMethodLatency());
+		assertTrue(latency >= TestClass.getMethodLatency());
 	}
 
 	@Test
