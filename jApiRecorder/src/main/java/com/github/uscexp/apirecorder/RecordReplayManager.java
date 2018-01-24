@@ -8,10 +8,6 @@ import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.sf.cglib.proxy.Enhancer;
-import net.sf.cglib.proxy.MethodInterceptor;
-import net.sf.cglib.proxy.MethodProxy;
-
 import com.github.uscexp.apirecorder.attributereplacement.AttributeValueReplacer;
 import com.github.uscexp.apirecorder.attributereplacement.ReplacementConfiguration;
 import com.github.uscexp.apirecorder.contenttypestrategy.ContentTypeStrategy;
@@ -27,6 +23,10 @@ import com.github.uscexp.apirecorder.readwritestrategy.H2ReadWriteStrategy;
 import com.github.uscexp.apirecorder.readwritestrategy.ReadWriteStrategy;
 import com.github.uscexp.dotnotation.exception.AttributeAccessExeption;
 
+import net.sf.cglib.proxy.Enhancer;
+import net.sf.cglib.proxy.MethodInterceptor;
+import net.sf.cglib.proxy.MethodProxy;
+
 /**
  * This class creates a dynamic proxy of a class to record/replay method calls.
  * <p>
@@ -37,21 +37,25 @@ import com.github.uscexp.dotnotation.exception.AttributeAccessExeption;
  * <dt>RECORD</dt>
  * <dd>calls the original method and records the returned value.</dd>
  * <dt>RP_ONLINE</dt>
- * <dd>tries first to get a return value from the recorded data. if there is one it will be returned,
- * else it calls the original method, records the return value and returns it.</dd>
+ * <dd>tries first to get a return value from the recorded data. if there is one
+ * it will be returned, else it calls the original method, records the return
+ * value and returns it.</dd>
  * <dt>RP_OFFLINE</dt>
- * <dd>tries to get a return value from the recorded data. if there is none it will return null.</dd>
- * </p>
- * It is possible to implement your own {@link ReadWriteStrategy} and/or {@link ContentTypeStrategy}.
- * You only have to implement the given interfaces.
+ * <dd>tries to get a return value from the recorded data. if there is none it
+ * will return null.</dd>
+ * </dl>
+ * It is possible to implement your own {@link ReadWriteStrategy} and/or
+ * {@link ContentTypeStrategy}. You only have to implement the given interfaces.
  * <p>
  * Already implemented {@link ContentTypeStrategy} is:<br>
- * {@link XStreamContentTypeStrategy} which serialize/deserialize the objects to be recorded/replayed with XStream.<br>
- * </p>
+ * {@link XStreamContentTypeStrategy} which serialize/deserialize the objects to
+ * be recorded/replayed with XStream.<br>
+ * 
  * <p>
  * Already implemented {@link ReadWriteStrategy} is:<br>
- * {@link H2ReadWriteStrategy} which reads/writes the objects to be recorded/replayed within a H2 database (memory or file database).
- * </p>
+ * {@link H2ReadWriteStrategy} which reads/writes the objects to be
+ * recorded/replayed within a H2 database (memory or file database).
+ * 
  * @author haui
  *
  */
@@ -68,13 +72,20 @@ public class RecordReplayManager extends Enhancer implements MethodInterceptor {
 	private final RecordReplayConfiguration recordReplayConfiguration;
 
 	/**
-	 * Creates a dynamic proxy of the given class using a constructor without parameters.
+	 * Creates a dynamic proxy of the given class using a constructor without
+	 * parameters.
 	 *
-	 * @param classToProxy class to create a dynamic proxy from it.
-	 * @param recordReplayMode the behavior of the proxy.
-	 * @param contentTypeStrategy the strategy for serialzation/deserialization.
-	 * @param readWriteStrategy the strategy for reading/writing the data.
-	 * @param recordReplayConfiguration the configuration of the identification of the recorded objects and the attribute replacment.
+	 * @param classToProxy
+	 *            class to create a dynamic proxy from it.
+	 * @param recordReplayMode
+	 *            the behavior of the proxy.
+	 * @param contentTypeStrategy
+	 *            the strategy for serialzation/deserialization.
+	 * @param readWriteStrategy
+	 *            the strategy for reading/writing the data.
+	 * @param recordReplayConfiguration
+	 *            the configuration of the identification of the recorded
+	 *            objects and the attribute replacment.
 	 * @return the dynamic proxy object.
 	 */
 	public static Object newInstance(Class<? extends Object> classToProxy, RecordReplayMode recordReplayMode,
@@ -84,16 +95,25 @@ public class RecordReplayManager extends Enhancer implements MethodInterceptor {
 	}
 
 	/**
-	* Creates a dynamic proxy of the given class using a constructor with parameters.
+	 * Creates a dynamic proxy of the given class using a constructor with
+	 * parameters.
 	 *
-	* @param classToProxy class to create a dynamic proxy from it.
-	 * @param parameterTypes parameter types for the constructor call.
-	 * @param args parameter args for the constructor call.
-	* @param recordReplayMode the behavior of the proxy.
-	* @param contentTypeStrategy the strategy for serialzation/deserialization.
-	* @param readWriteStrategy the strategy for reading/writing the data.
-	* @param recordReplayConfiguration the configuration of the identification of the recorded objects and the attribute replacment.
-	* @return the dynamic proxy object.
+	 * @param classToProxy
+	 *            class to create a dynamic proxy from it.
+	 * @param parameterTypes
+	 *            parameter types for the constructor call.
+	 * @param args
+	 *            parameter args for the constructor call.
+	 * @param recordReplayMode
+	 *            the behavior of the proxy.
+	 * @param contentTypeStrategy
+	 *            the strategy for serialzation/deserialization.
+	 * @param readWriteStrategy
+	 *            the strategy for reading/writing the data.
+	 * @param recordReplayConfiguration
+	 *            the configuration of the identification of the recorded
+	 *            objects and the attribute replacment.
+	 * @return the dynamic proxy object.
 	 */
 	public static Object newInstance(Class<? extends Object> classToProxy, Class<? extends Object>[] parameterTypes, Object[] args,
 			RecordReplayMode recordReplayMode, ContentTypeStrategy contentTypeStrategy, ReadWriteStrategy readWriteStrategy,
@@ -104,10 +124,11 @@ public class RecordReplayManager extends Enhancer implements MethodInterceptor {
 		recordReplayManager.setSuperclass(classToProxy);
 		recordReplayManager.setCallback(recordReplayManager);
 
-		if ((parameterTypes == null) || (args == null))
+		if ((parameterTypes == null) || (args == null)) {
 			return recordReplayManager.create();
-		else
+		} else {
 			return recordReplayManager.create(parameterTypes, args);
+		}
 	}
 
 	private RecordReplayManager(RecordReplayMode recordReplyMode, ContentTypeStrategy contentTypeStrategy,
@@ -122,6 +143,7 @@ public class RecordReplayManager extends Enhancer implements MethodInterceptor {
 		}
 	}
 
+	@Override
 	public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) {
 		RecordInformation recordInformation = new RecordInformation(method.getName(), args,
 				recordReplayConfiguration.getArgumentIndices4PrimaryKey(method.getName()));
@@ -129,52 +151,52 @@ public class RecordReplayManager extends Enhancer implements MethodInterceptor {
 		try {
 
 			switch (recordReplayMode) {
-				case FOREWARD:
-					recordInformation = foreward(obj, method, args, proxy);
-					break;
+			case FOREWARD:
+				recordInformation = foreward(obj, method, args, proxy);
+				break;
 
-				case RECORD:
+			case RECORD:
+				recordInformation = foreward(obj, method, args, proxy);
+				record(recordInformation);
+				break;
+
+			case RP_ONLINE:
+				recordInformation = replay(obj, method, args, proxy);
+				if (recordInformation.getReturnValue() == null) {
 					recordInformation = foreward(obj, method, args, proxy);
 					record(recordInformation);
-					break;
+				}
+				break;
 
-				case RP_ONLINE:
-					recordInformation = replay(obj, method, args, proxy);
-					if (recordInformation.getReturnValue() == null) {
-						recordInformation = foreward(obj, method, args, proxy);
-						record(recordInformation);
-					}
-					break;
-
-				case RP_OFFLINE:
-					recordInformation = replay(obj, method, args, proxy);
-					break;
+			case RP_OFFLINE:
+				recordInformation = replay(obj, method, args, proxy);
+				break;
 			}
-		} catch (ContentTypeStrategyException | ReadWriteStrategyException | AttributeAccessExeption | ReplacementValueException |
-				InterruptedException e) {
+		} catch (ContentTypeStrategyException | ReadWriteStrategyException | AttributeAccessExeption | ReplacementValueException | InterruptedException e) {
 			throw new RecordReplayException("Unexpected exception in RecordReplayManager", e);
 		}
 		return recordInformation.getReturnValue();
 	}
 
 	private RecordInformation replay(Object obj, Method method, Object[] args, MethodProxy proxy)
-		throws ReadWriteStrategyException, ContentTypeStrategyException, AttributeAccessExeption, ReplacementValueException,
+			throws ReadWriteStrategyException, ContentTypeStrategyException, AttributeAccessExeption, ReplacementValueException,
 			InterruptedException {
 		RecordInformation result = null;
 		if (recordReplayConfiguration.isSimulateLatency()) {
 			result = new RecordInformation(method.getName(), args, recordReplayConfiguration, readWriteStrategy);
 			if ((recordReplayMode == RecordReplayMode.RP_ONLINE) &&
-					(result.getLatencyData().getLatencies().size() <
-						recordReplayConfiguration.getLatencyConfiguration(method.getName()).getNumberOfCycles()))
+					(result.getLatencyData().getLatencies().size() < recordReplayConfiguration.getLatencyConfiguration(method.getName()).getNumberOfCycles())) {
 				return result;
+			}
 		} else {
 			result = new RecordInformation(method.getName(), args,
 					recordReplayConfiguration.getArgumentIndices4PrimaryKey(method.getName()));
 		}
 		logStep(method, args, "replay...");
 		String serializedObject = readWriteStrategy.read(result.getReturnValueId());
-		if (recordReplayConfiguration.isSimulateLatency())
+		if (recordReplayConfiguration.isSimulateLatency()) {
 			Thread.sleep(result.calculateLatency());
+		}
 		if (serializedObject != null) {
 			Object object = contentTypeStrategy.deserialize(serializedObject);
 			if (object != null) {
@@ -190,7 +212,7 @@ public class RecordReplayManager extends Enhancer implements MethodInterceptor {
 	}
 
 	private void record(RecordInformation recordInformation)
-		throws ContentTypeStrategyException, ReadWriteStrategyException {
+			throws ContentTypeStrategyException, ReadWriteStrategyException {
 
 		String type = "?";
 		if (recordInformation.getReturnValue() != null) {
@@ -215,8 +237,9 @@ public class RecordReplayManager extends Enhancer implements MethodInterceptor {
 				int cycles = 1;
 				int ignoreFirstNumberOfCycles = latencyConfiguration.getIgnoreFirstNumberOfCycles();
 				ignoreFirstNumberOfCycles = (ignoreFirstNumberOfCycles < 0) ? 0 : latencyConfiguration.getIgnoreFirstNumberOfCycles();
-				if (latencyConfiguration.isRecordAtOnce() && (latencyConfiguration.getLatencyType() == LatencyType.CYCLES_CALCULATED_DELAY))
+				if (latencyConfiguration.isRecordAtOnce() && (latencyConfiguration.getLatencyType() == LatencyType.CYCLES_CALCULATED_DELAY)) {
 					cycles = latencyConfiguration.getNumberOfCycles() + ignoreFirstNumberOfCycles;
+				}
 				result = new RecordInformation(method.getName(), args, recordReplayConfiguration, readWriteStrategy);
 				for (int i = 0; i < cycles; i++) {
 					Trace trace = new Trace();
